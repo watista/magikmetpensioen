@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <title>Mag ik met pensioen?</title>
+    <meta charset="utf-8">
+    <meta name="title" content="Mag ik met pensioen?">
+    <meta name="description" content="Ontdek je AOW-leeftijd en zie precies hoeveel werkdagen, weken en uren je nog moet werken tot je pensioen.">
+    <meta name="robots" content="INDEX,FOLLOW">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@0.11.0/dist/js-confetti.browser.js"></script>
+</head>
+
+<body class="bg-light" data-can-retire="{% if can_retire is True %}true{% elif can_retire is False %}false{% else %}undefined{% endif %}">
+    <div id="particles-js"></div>
+    <div class="container py-5">
+        <h1 class="mb-4 text-center">Mag ik met pensioen?</h1>
+        <p class="text-muted text-center">
+            Check hier of je al met pensioen mag, of hoelang je nog moet werken...
+        </p>
+        <div class="card shadow-sm mx-auto" style="max-width:32rem;">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.birth_date.label_tag }}
+                        {{ form.birth_date }}
+                    </div>
+                    <button class="btn btn-primary w-100" type="submit">Check!</button>
+                    {% if error %}
+                    <div class="alert alert-danger mt-3">{{ error }}</div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        {% if can_retire is not None %}
+        <div id="retireAnimation" class="text-center my-4 fs-1 fw-bold">
+            {% if can_retire %}
+            <span class="text-success animate-answer">JA! 🎉</span>
+            <p class="fs-4 text-success">Gefeliciteerd, je kunt met pensioen!</p>
+            {% else %}
+            <span class="text-danger animate-answer">NEE... 😢</span>
+            <p class="fs-4 text-secondary">Nog even volhouden...</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if result %}
+        <div class="card shadow-sm mx-auto mt-4 border-primary" style="max-width:32rem;">
+            <div class="card-header bg-primary text-white">Result</div>
+            <div class="card-body">
+                <p><strong>Statutory age:</strong> {{ result.ret_age }}</p>
+                <p><strong>Retirement date:</strong> {{ result.ret_date }}</p>
+                {% if result.left and not can_retire %}
+                <p><strong>Time left:</strong> {{ result.left }}</p>
+                {% endif %}
+            </div>
+            {% if result.left and not can_retire %}
+            <hr>
+            <h6>Expected work time left</h6>
+            <ul class="mb-0">
+                <li><strong>Jaren:</strong> {{ result.work_time.work_years }}</li>
+                <li><strong>Maanden:</strong> {{ result.work_time.work_months }}</li>
+                <li><strong>Weken:</strong> {{ result.work_time.work_weeks }}</li>
+                <li><strong>Dagen:</strong> {{ result.work_time.work_days }}</li>
+                <li><strong>Uren:</strong> {{ result.work_time.work_hours }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        {% if warning and not can_retire %}
+        <div class="alert alert-warning mt-3 text-center">
+            {{ warning }}
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if can_retire is not None %}
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-outline-primary btn-lg">Opnieuw proberen</a>
+        </div>
+        {% endif %}
+    </div>
+    <!-- JavaScript -->
+    <div id="js-context" data-csrf-token="{{ csrf_token }}" data-reorder-url="{% url 'index' %}"></div>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canRetire = document.body.dataset.canRetire;
+
+        if (canRetire === "true") {
+            new JSConfetti().addConfetti({
+                emojis: ['🎉', '🎊', '🥳', '🍾'],
+                emojiSize: 120,
+                confettiNumber: 40,
+            });
+        } else if (canRetire === "false") {
+            new JSConfetti().addConfetti({
+                emojis: ['😢', '😞', '🥺', '💧'],
+                emojiSize: 120,
+                confettiNumber: 40,
+            });
+        }
+        // "undefined" means: first load, do nothing
+    });
+    </script>
+</body>
+
+</html>

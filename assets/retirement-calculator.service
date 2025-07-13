@@ -1,0 +1,16 @@
+[Unit]
+Description=Uvicorn instance to serve Retirement Calculator (ASGI)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/magikmetpensioen
+Environment="DJANGO_SETTINGS_MODULE=retirement_project.settings"
+ExecStart=/var/www/magikmetpensioen/env/bin/uvicorn \
+    retirement_project.asgi:application \
+    --uds /var/www/magikmetpensioen/uvicorn.sock \
+    --workers 4
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+django
+django-widget-tweaks
+python-dateutil
+python-decouple
+uvicorn
+colorlog
