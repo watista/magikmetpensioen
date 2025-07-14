@@ -3,10 +3,10 @@ from django import forms
 
 class BirthDateForm(forms.Form):
     birth_date = forms.CharField(
-        label="Geboortedatum (dd-mm-yyyy)",
+        label="Geboortedatum (dd-mm-jjjj)",
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "dd-mm-yyyy",
+            "placeholder": "01-01-1990",
             "inputmode": "numeric",
             "maxlength": "10",
             "id": "birthDateInput",

@@ -68,3 +68,38 @@ button:hover {
     60%  { transform: scale(1.1); opacity: 1; }
     100% { transform: scale(1); }
 }
+
+.card-title i {
+  font-size: 1.2rem;
+}
+.card {
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: scale(1.015);
+}
+
+.progress-wrapper {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.progress {
+  background-color: #e9ecef;
+  border-radius: 999px;
+}
+.progress-bar {
+  font-weight: bold;
+}
+
+.card-header {
+  font-size: 1.1rem;
+}
+.display-5 {
+  font-size: 2.25rem;
+}
+
+.bg-success-subtle,
+.bg-danger-subtle {
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}

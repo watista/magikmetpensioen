@@ -32,23 +32,30 @@ def index(request):
                 # build result dict
                 result = {
                     "ret_age": str(r_age),
-                    "ret_date": r_date.strftime("%d %b %Y"),
+                    "ret_date": r_date,
                     "left": (
-                        f"{left.years} year{'s' if left.years != 1 else ''}, "
-                        f"{left.months} month{'s' if left.months != 1 else ''}, "
-                        f"{left.days} day{'s' if left.days != 1 else ''}"
+                        f"{left.years} jaar{'' if left.years != 1 else ''}, "
+                        f"{left.months} maand{'en' if left.months != 1 else ''}, "
+                        f"{left.days} dag{'en' if left.days != 1 else ''}"
                     ),
                     "work_time": work_stats,
                 }
 
+                today = date.today()
+                total_span = (r_date - birth).days
+                elapsed = (today - birth).days
+
+                if total_span > 0:
+                    percent_done = min(100, int(100 * (elapsed / total_span)))
+                else:
+                    percent_done = 100
+                result["progress_percent"] = percent_done
+
                 if r_age.estimated or is_est1 or is_est2:
-                    warning = (
-                        "The AOW age shown is an estimate based on projected "
-                        "life-expectancy figures (CBS projections beyond 2040)."
-                    )
+                    warning = "De AOW-leeftijd is een schatting op basis van de verwachte levensverwachting (CBS-prognoses na 2040)."
 
             except ValueError:
-                error = "Please enter a valid date in dd-mm-yyyy format (e.g. 10-05-1995)."
+                error = "Voer een geldige datum in dd-mm-jjj-formaat in (bijv. 10-05-1995)."
             except Exception as exc:
                 error = str(exc)
     else:

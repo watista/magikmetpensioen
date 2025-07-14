@@ -18,9 +18,9 @@ class RetirementResult:
         self.estimated = estimated
 
     def __str__(self) -> str:
-        y = f"{self.years} year{'s' if self.years != 1 else ''}" if self.years else ""
-        m = f"{self.months} month{'s' if self.months != 1 else ''}" if self.months else ""
-        return " and ".join(part for part in (y, m) if part)
+        y = f"{self.years} jaar{'' if self.years != 1 else ''}" if self.years else ""
+        m = f"{self.months} maand{'en' if self.months != 1 else ''}" if self.months else ""
+        return " en ".join(part for part in (y, m) if part)
 
 
 # ────────────────────────────────────────────────────────────────────────────────
@@ -98,9 +98,9 @@ def retirement_age(birth: date) -> RetirementResult:
     • Estimated=True when relying on extrapolated life-expectancy figures.
     """
     if birth.year < 1900:
-        raise UnknownRetirementAge("Birth years before 1900 are not supported.")
+        raise UnknownRetirementAge("Geboortejaren voor 1900 worden niet ondersteund.")
     if birth.year > 2100:
-        raise UnknownRetirementAge("Birth years after 2100 are not supported.")
+        raise UnknownRetirementAge("Geboortejaren na 2100 worden niet ondersteund.")
     if birth.year < 1953:
         return RetirementResult(65, 0, estimated=True)
 
@@ -113,7 +113,7 @@ def retirement_age(birth: date) -> RetirementResult:
         try:
             date_at_age = birth + relativedelta(years=yrs, months=mos)
         except ValueError:
-            raise UnknownRetirementAge("Retirement date exceeds maximum supported year.")
+            raise UnknownRetirementAge("Pensioendatum overschrijdt maximum ondersteunde jaar.")
         if date_at_age.year == year:
             return RetirementResult(yrs, mos, est_flag)
 
