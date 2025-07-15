@@ -83,7 +83,7 @@ ACCESS_LOGGING = {
 }
 
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
-LOG_FILENAME = f'dynamic-timers-{time.strftime("%m-%d-%Y")}.log'
+LOG_FILENAME = f'magikmetpensioen-{time.strftime("%m-%d-%Y")}.log'
 
 active_handlers = ['console']
 if LOG_LEVEL == 'DEBUG':
