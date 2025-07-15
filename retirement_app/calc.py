@@ -1,9 +1,10 @@
-# calculator/calc.py
 from __future__ import annotations
 from datetime import date, timedelta
 from functools import lru_cache
 from dateutil.relativedelta import relativedelta
+import logging
 
+logger = logging.getLogger('retirement_app')
 
 class UnknownRetirementAge(Exception):
     """Raised when no AOW-leeftijd can be calculated (e.g., very old dates)."""
@@ -112,7 +113,8 @@ def retirement_age(birth: date) -> RetirementResult:
         mos  = round((age_float - yrs) * 12)
         try:
             date_at_age = birth + relativedelta(years=yrs, months=mos)
-        except ValueError:
+        except ValueError as ve:
+            logger.warning(f"Pensioendatum overschrijdt maximum ondersteunde jaar - {ve}")
             raise UnknownRetirementAge("Pensioendatum overschrijdt maximum ondersteunde jaar.")
         if date_at_age.year == year:
             return RetirementResult(yrs, mos, est_flag)

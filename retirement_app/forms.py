@@ -3,6 +3,7 @@ from django import forms
 
 class BirthDateForm(forms.Form):
     birth_date = forms.CharField(
+        required=True,
         label="Geboortedatum (dd-mm-jjjj)",
         widget=forms.TextInput(attrs={
             "class": "form-control",

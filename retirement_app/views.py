@@ -1,5 +1,7 @@
+import logging
 from datetime import date, datetime
 from django.shortcuts import render
+from .usage_tracker import increment_usage
 from .forms import BirthDateForm
 from .calc import (
     retirement_age,
@@ -8,6 +10,7 @@ from .calc import (
     working_time_left,
 )
 
+logger = logging.getLogger('retirement_app')
 
 def index(request):
     result = error = warning = None
@@ -18,6 +21,8 @@ def index(request):
         form = BirthDateForm(request.POST)
         if form.is_valid():
             raw_input = form.cleaned_data["birth_date"]
+            increment_usage(raw_input)
+            logger.info(f"Form submitted with birthdate: {raw_input}")
 
             try:
                 birth = datetime.strptime(raw_input, "%d-%m-%Y").date()
@@ -54,9 +59,11 @@ def index(request):
                 if r_age.estimated or is_est1 or is_est2:
                     warning = "De AOW-leeftijd is een schatting op basis van de verwachte levensverwachting (CBS-prognoses na 2040)."
 
-            except ValueError:
+            except ValueError as ve:
+                logger.warning(f"Invalid birthdate input: {raw_input} - {ve}")
                 error = "Voer een geldige datum in dd-mm-jjj-formaat in (bijv. 10-05-1995)."
             except Exception as exc:
+                logger.exception(f"Unexpected error occurred during form submission: {exc}")
                 error = str(exc)
     else:
         form = BirthDateForm()
@@ -73,3 +80,6 @@ def index(request):
             "can_retire": can_retire,
         },
     )
+
+def over(request):
+    return render(request, "over.html")

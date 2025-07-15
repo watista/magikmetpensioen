@@ -1,5 +1,5 @@
 [Unit]
-Description=Uvicorn instance to serve Retirement Calculator (ASGI)
+Description=Uvicorn instance to serve magikmetpensioen (ASGI)
 After=network.target
 
 [Service]

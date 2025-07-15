@@ -103,3 +103,14 @@ button:hover {
 .bg-danger-subtle {
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
+
+.accordion-button:focus {
+    box-shadow: none !important;
+}
+
+.accordion-button {
+    margin-top: 0;
+}
+.accordion-button:hover {
+    background: #bdd5f9;
+}

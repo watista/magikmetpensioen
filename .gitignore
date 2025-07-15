@@ -6,6 +6,7 @@
 *.db-wal
 *.db
 static/*
+usage_stats.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

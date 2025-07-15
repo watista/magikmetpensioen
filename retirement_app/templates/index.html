@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="nl">
 
 <head>
-    <title>Mag ik met pensioen?</title>
+    <title>{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Mag ik met pensioen?{% endif %}</title>
     <meta charset="utf-8">
-    <meta name="title" content="Mag ik met pensioen?">
+    <meta name="title" content="{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Mag ik met pensioen?{% endif %}">
     <meta name="description" content="Ontdek je AOW-leeftijd en zie precies hoeveel werkdagen, weken en uren je nog moet werken tot je pensioen.">
     <meta name="robots" content="INDEX,FOLLOW">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
@@ -17,114 +17,157 @@
     <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-confetti@0.11.0/dist/js-confetti.browser.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RGTQ0F1WW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'G-2RGTQ0F1WW');
+    </script>
 </head>
 
 <body class="bg-light" data-can-retire="{% if can_retire is True %}true{% elif can_retire is False %}false{% else %}undefined{% endif %}">
     <div id="particles-js"></div>
-    <div class="container py-5 {% if result.left and not can_retire %}border animate-answer border-4 border-danger bg-danger-subtle rounded p-3{% elif result.left and can_retire %}border animate-answer border-4 border-success bg-success-subtle rounded p-3{% else %}{% endif %}">
-        <h1 class="mb-4 text-center fw-bold">Mag ik met pensioen?</h1>
-        {% if not result %}
-        <p class="text-muted text-center">
-            Check hier of je al met pensioen mag, of hoelang je nog moet werken...
-        </p>
-        <div class="card shadow-sm mx-auto" style="max-width:32rem;">
-            <div class="card-body">
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        {{ form.birth_date.label_tag }}
-                        {{ form.birth_date }}
-                    </div>
-                    <button class="btn btn-primary w-100" type="submit">Check!</button>
-                    {% if error %}
-                    <div class="alert alert-danger mt-3">{{ error }}</div>
-                    {% endif %}
-                </form>
+    <div style="margin: 0 0.75rem">
+        <div class="container py-5 {% if result.left and not can_retire %}border animate-answer border-4 border-danger bg-danger-subtle rounded p-3{% elif result.left and can_retire %}border animate-answer border-4 border-success bg-success-subtle rounded p-3{% else %}{% endif %}" data-aos="fade-up">
+            <h1 class="mb-4 text-center fw-bold">Mag ik met pensioen?</h1>
+            {% if not result %}
+            <p class="text-muted text-center">
+                Check hier of je al met pensioen mag, of hoelang je nog moet werken...
+            </p>
+            <div class="card shadow-sm mx-auto" style="max-width:32rem;">
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.birth_date.label_tag }}
+                            {{ form.birth_date }}
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">Check!</button>
+                        {% if error %}
+                        <div class="alert alert-danger mt-3">{{ error }}</div>
+                        {% endif %}
+                    </form>
+                </div>
             </div>
-        </div>
-        {% endif %}
-        {% if can_retire is not None %}
-        <div id="retireAnimation" class="text-center my-4 fs-1 fw-bold">
-            {% if can_retire %}
-            <span class="text-success">Ja, je mag met pensioen! 🎉</span>
-            {% else %}
-            <span class="text-danger">Nee, nog even volhouden! 😢</span>
             {% endif %}
-        </div>
-        {% endif %}
-        {% if result %}
-        <div class="container my-5">
-            <div class="row g-4 justify-content-center">
-                <div class="container">
-                    <div class="card text-center border-4 border-primary shadow-sm mx-auto">
-                        <div class="card-header bg-primary text-white fw-bold">📅 Pensioenleeftijd</div>
-                        <div class="card-body" style="padding-bottom: 0;">
-                            <p class="display-5 fw-bold mb-1 text-primary">{{ result.ret_age }}</p>
-                            <p class="text-muted fw-bold">op {{ result.ret_date|date:"j F Y" }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-wrapper my-3">
-                    <div class="d-flex justify-content-between small mb-1 text-muted fw-bold">
-                        <span><i class="fa-solid fa-baby me-1"></i>Geboren</span>
-                        <span><i class="fa-solid fa-person-cane me-1"></i>Pensioen</span>
-                    </div>
-                    <div class="progress" style="height: 20px;">
-                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ result.progress_percent }}%;" aria-valuenow="{{ result.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
-                            {{ result.progress_percent }}%
-                        </div>
-                    </div>
-                </div>
-                <!-- Time Left Block -->
-                <div class="{% if result.left and not can_retire %}col-md-6{% else %}col-md-12{% endif %}">
-                    <div class="card shadow-sm h-100 border-start border-4 border-primary">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary"><i class="fa-solid fa-hourglass-half me-2"></i>Tijd tot pensioen</h5>
-                            <ul class="list-unstyled mt-3">
-                                <li style="margin-bottom: 0.5rem;"><strong style="display: block">Pensioenleeftijd</strong> {{ result.ret_age }}</li>
-                                <li style="margin-bottom: 0.5rem;"><strong style="display: block">Pensioendatum</strong> {{ result.ret_date|date:"j F Y" }}</li>
-                                {% if result.left and not can_retire %}
-                                <li style="margin-bottom: 0.5rem;"><strong style="display: block">Resterende tijd</strong> {{ result.left }}</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% if result.left and not can_retire %}
-                <!-- Work Time Block -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100 border-start border-4 border-success">
-                        <div class="card-body">
-                            <h5 class="card-title text-success"><i class="fa-solid fa-briefcase me-2"></i>Dat zijn nog</h5>
-                            <ul class="list-unstyled mt-3">
-                                <li><strong>{{ result.work_time.work_years }}</strong> Jaren werken</li>
-                                <hr style="margin: 0.5rem 0">
-                                <li><strong>{{ result.work_time.work_months }}</strong> Maanden werken</li>
-                                <hr style="margin: 0.5rem 0">
-                                <li><strong>{{ result.work_time.work_weeks }}</strong> Weken werken</li>
-                                <hr style="margin: 0.5rem 0">
-                                <li><strong>{{ result.work_time.work_days }}</strong> Dagen werken</li>
-                                <hr style="margin: 0.5rem 0">
-                                <li><strong>{{ result.work_time.work_hours }}</strong> Uren werken</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            {% if can_retire is not None %}
+            <div id="retireAnimation" class="text-center my-4 fs-1 fw-bold">
+                {% if can_retire %}
+                <span class="text-success">Ja, je mag met pensioen! 🎉</span>
+                {% else %}
+                <span class="text-danger">Nee, nog even volhouden! 😢</span>
                 {% endif %}
             </div>
+            {% endif %}
+            {% if result %}
+            <div class="container my-5">
+                <div class="row g-4 justify-content-center">
+                    <div class="container">
+                        <div class="card text-center border-4 border-primary shadow-sm mx-auto">
+                            <div class="card-header bg-primary text-white fw-bold">📅 Pensioenleeftijd</div>
+                            <div class="card-body" style="padding-bottom: 0;">
+                                <p class="display-5 fw-bold mb-1 text-primary">{{ result.ret_age }}</p>
+                                <p class="text-muted fw-bold">op {{ result.ret_date|date:"j F Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper my-3">
+                        <div class="d-flex justify-content-between medium mb-1 text-muted fw-bold">
+                            <span><i class="fa-solid fa-baby me-1"></i>Geboren</span>
+                            <span><i class="fa-solid fa-person-cane me-1"></i>Pensioen</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ result.progress_percent }}%;" aria-valuenow="{{ result.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ result.progress_percent }}%
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Time Left Block -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100 border-start border-4 border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary"><i class="fa-solid fa-hourglass-half me-2"></i>Tijd tot pensioen</h5>
+                                <ul class="list-unstyled mt-3">
+                                    <li style="margin-bottom: 0.5rem;"><strong style="display: block">Pensioenleeftijd</strong> {{ result.ret_age }}</li>
+                                    <li style="margin-bottom: 0.5rem;"><strong style="display: block">Pensioendatum</strong> {{ result.ret_date|date:"j F Y" }}</li>
+                                    {% if result.left and not can_retire %}
+                                    <li style="margin-bottom: 0.5rem;"><strong style="display: block">Resterende tijd</strong> {{ result.left }}</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% if result.left and not can_retire %}
+                    <!-- Work Time Block -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100 border-start border-4 border-success">
+                            <div class="card-body">
+                                <h5 class="card-title text-success"><i class="fa-solid fa-briefcase me-2"></i>Dat zijn nog</h5>
+                                <ul class="list-unstyled mt-3">
+                                    <li><strong>{{ result.work_time.work_years }}</strong> Jaren werken</li>
+                                    <hr style="margin: 0.5rem 0">
+                                    <li><strong>{{ result.work_time.work_months }}</strong> Maanden werken</li>
+                                    <hr style="margin: 0.5rem 0">
+                                    <li><strong>{{ result.work_time.work_weeks }}</strong> Weken werken</li>
+                                    <hr style="margin: 0.5rem 0">
+                                    <li><strong>{{ result.work_time.work_days }}</strong> Dagen werken</li>
+                                    <hr style="margin: 0.5rem 0">
+                                    <li><strong>{{ result.work_time.work_hours }}</strong> Uren werken</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if warning and not can_retire %}
+            <div class="alert alert-warning mt-3 text-center fw-bold">
+                {{ warning }}
+            </div>
+            {% endif %}
+            {% endif %}
+            {% if can_retire is not None %}
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary btn-lg fw-bold">Opnieuw proberen</a>
+            </div>
+            {% endif %}
         </div>
-        {% if warning and not can_retire %}
-        <div class="alert alert-warning mt-3 text-center fw-bold">
-            {{ warning }}
-        </div>
-        {% endif %}
-        {% endif %}
-        {% if can_retire is not None %}
-        <div class="text-center mt-4">
-            <a href="/" class="btn btn-primary btn-lg fw-bold">Opnieuw proberen</a>
-        </div>
-        {% endif %}
     </div>
+    {% if result %}
+    <!-- Retirement info block -->
+    <div class="container mt-5 animate-answer" data-aos="fade-up">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Meer weten over je pensioen?</h5>
+            </div>
+            <div class="card-body">
+                <p>Nu je weet wanneer je AOW-leeftijd is, is het handig om je goed voor te bereiden op je pensioen. Hier zijn een paar nuttige bronnen:</p>
+                <ul class="list-unstyled">
+                    <li><i class="fa-solid fa-link me-2 text-muted"></i>
+                        <a href="https://www.svb.nl/nl/aow" target="_blank" rel="noopener">Officiële AOW informatie – SVB</a>
+                    </li>
+                    <li><i class="fa-solid fa-link me-2 text-muted"></i>
+                        <a href="https://www.mijnpensioenoverzicht.nl" target="_blank" rel="noopener">MijnPensioenoverzicht.nl – Inzicht in je pensioen</a>
+                    </li>
+                    <li><i class="fa-solid fa-link me-2 text-muted"></i>
+                        <a href="https://www.rijksoverheid.nl/onderwerpen/pensioen" target="_blank" rel="noopener">Pensioenbeleid – Rijksoverheid</a>
+                    </li>
+                    <li><i class="fa-solid fa-link me-2 text-muted"></i>
+                        <a href="https://www.nibud.nl/onderwerpen/pensioen/" target="_blank" rel="noopener">Nibud – Pensioen en geldzaken</a>
+                    </li>
+                </ul>
+                <p class="mt-3">💡 Tip: log in bij <strong>MijnPensioenoverzicht</strong> met DigiD om een compleet beeld van je pensioenopbouw te krijgen.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <footer class="text-center mt-5 mb-3 text-muted">
+        <small>
+            <a href="{% url 'over' %}" class="text-decoration-none btn btn-outline-primary">Over deze site</a>
+        </small>
+    </footer>
     <!-- JavaScript -->
     <div id="js-context" data-csrf-token="{{ csrf_token }}" data-reorder-url="{% url 'index' %}"></div>
     <script src="{% static 'js/utils.js' %}"></script>
