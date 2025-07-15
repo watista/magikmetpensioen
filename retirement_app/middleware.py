@@ -9,7 +9,7 @@ class AccessLogMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        ip = request.META.get("REMOTE_ADDR")
+        ip = get_client_ip(request)
         method = request.method
         path = request.get_full_path()
         status = response.status_code
@@ -17,3 +17,11 @@ class AccessLogMiddleware:
 
         access_logger.info(f'{ip} - "{method} {path}" {status} "{user_agent}"')
         return response
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
