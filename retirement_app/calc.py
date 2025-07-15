@@ -102,34 +102,36 @@ def retirement_age(birth: date) -> RetirementResult:
         raise UnknownRetirementAge("Geboortejaren voor 1900 worden niet ondersteund.")
     if birth.year > 2100:
         raise UnknownRetirementAge("Geboortejaren na 2100 worden niet ondersteund.")
-    if birth.year < 1953:
-        return RetirementResult(65, 0, estimated=True)
 
     schedule = _age_schedule()
 
-    # Scan through the calendar years in which retirement could fall.
-    for year, (age_float, est_flag) in schedule.items():
-        yrs  = int(age_float)
-        mos  = round((age_float - yrs) * 12)
-        try:
-            date_at_age = birth + relativedelta(years=yrs, months=mos)
-        except ValueError as ve:
-            logger.warning(f"Pensioendatum overschrijdt maximum ondersteunde jaar - {ve}")
-            raise UnknownRetirementAge("Pensioendatum overschrijdt maximum ondersteunde jaar.")
-        if date_at_age.year == year:
-            return RetirementResult(yrs, mos, est_flag)
-
-    # Even beyond 2150 we very rarely end up here, but if so keep extrapolating
-    # year-by-year until we hit the candidate year.
-    current_year = max(schedule) + 1
-    current_age, _ = schedule[max(schedule)]
-    while True:
-        current_age = round(current_age + 0.25, 2)   # assume a rise every year
-        yrs, mos = int(current_age), round((current_age - int(current_age)) * 12)
+    for year in sorted(schedule.keys()):
+        age_float, is_estimate = schedule[year]
+        yrs = int(age_float)
+        mos = round((age_float - yrs) * 12)
         date_at_age = birth + relativedelta(years=yrs, months=mos)
-        if date_at_age.year == current_year:
+
+        # Retirement happens if the birthday + retirement age falls within that year
+        if date_at_age.year <= year:
+            return RetirementResult(yrs, mos, is_estimate)
+
+    # If not found in predefined schedule, extrapolate
+    current_year = max(schedule) + 1
+    current_age = schedule[max(schedule)][0]
+    attempts = 0
+    max_attempts = 400
+
+    while attempts < max_attempts:
+        current_age = round(current_age + 0.25, 2)
+        yrs = int(current_age)
+        mos = round((current_age - yrs) * 12)
+        date_at_age = birth + relativedelta(years=yrs, months=mos)
+        if date_at_age.year <= current_year:
             return RetirementResult(yrs, mos, True)
         current_year += 1
+        attempts += 1
+
+    raise UnknownRetirementAge("Could not determine retirement age after extrapolation.")
 
 
 def retirement_date(birth: date) -> tuple[date, bool]:
