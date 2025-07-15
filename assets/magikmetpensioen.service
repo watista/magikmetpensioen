@@ -7,10 +7,10 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/magikmetpensioen
 Environment="DJANGO_SETTINGS_MODULE=retirement_project.settings"
-ExecStart=/var/www/magikmetpensioen/env/bin/uvicorn \
-    retirement_project.asgi:application \
-    --uds /var/www/magikmetpensioen/uvicorn.sock \
-    --workers 4
+ExecStart=/var/www/magikmetpensioen/env/bin/uvicorn retirement_project.asgi:application --host 0.0.0.0 --port 9001 --workers 4
+KillMode=process
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+Alias=magikmetpensioen.service
