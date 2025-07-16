@@ -170,32 +170,10 @@
     </footer>
     <!-- JavaScript -->
     <div id="js-context" data-csrf-token="{{ csrf_token }}" data-reorder-url="{% url 'index' %}"></div>
+    <script src="{% static 'js/utils.js' %}"></script>
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         const canRetire = document.body.dataset.canRetire;
-        const input = document.getElementById("birthDateInput");
-
-        input.addEventListener("input", function() {
-            let value = input.value.replace(/\D/g, "");
-            if (value.length > 8) value = value.slice(0, 8);
-
-            let formatted = "";
-            if (value.length >= 2) {
-                formatted += value.slice(0, 2);
-                if (value.length >= 4) {
-                    formatted += "-" + value.slice(2, 4);
-                    if (value.length > 4) {
-                        formatted += "-" + value.slice(4);
-                    }
-                } else {
-                    formatted += "-" + value.slice(2);
-                }
-            } else {
-                formatted += value;
-            }
-
-            input.value = formatted;
-        });
 
         if (canRetire === "true") {
             new JSConfetti().addConfetti({
