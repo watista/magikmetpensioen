@@ -74,8 +74,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 365
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 if DEBUG:
     SECURE_SSL_REDIRECT = False

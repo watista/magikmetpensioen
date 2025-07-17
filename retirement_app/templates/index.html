@@ -130,7 +130,7 @@
             {% endif %}
             {% if can_retire is not None %}
             <div class="text-center mt-4">
-                <a href="/" class="btn btn-primary btn-lg fw-bold">Opnieuw proberen</a>
+                <a href="{% url 'reset' %}" class="btn btn-primary btn-lg fw-bold">Opnieuw proberen</a>
             </div>
             {% endif %}
         </div>

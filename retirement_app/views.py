@@ -1,6 +1,6 @@
 import logging
 from datetime import date, datetime
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .usage_tracker import increment_usage
 from .forms import BirthDateForm
 from .calc import (
@@ -21,6 +21,8 @@ def index(request):
         form = BirthDateForm(request.POST)
         if form.is_valid():
             raw_input = form.cleaned_data["birth_date"]
+            request.session["last_birth_date"] = raw_input
+            request.session.set_expiry(300)
             increment_usage(raw_input)
             logger.info(f"Form submitted with birthdate: {raw_input}")
 
@@ -66,7 +68,50 @@ def index(request):
                 logger.exception(f"Unexpected error occurred during form submission: {exc}")
                 error = str(exc)
     else:
-        form = BirthDateForm()
+        # Check session for last date if not POST
+        last_birth = request.session.get("last_birth_date")
+        if last_birth:
+            form = BirthDateForm(initial={"birth_date": last_birth})
+            try:
+                birth = datetime.strptime(last_birth, "%d-%m-%Y").date()
+
+                # ── core calculations ────────────────────────────────────
+                r_age = retirement_age(birth)
+                r_date, is_est1 = retirement_date(birth)
+                left, is_est2 = time_left(birth)
+                work_stats = working_time_left(birth)
+                can_retire = (left.years <= 0 and left.months <= 0 and left.days <= 0)
+
+                # build result dict
+                result = {
+                    "ret_age": str(r_age),
+                    "ret_date": r_date,
+                    "left": (
+                        f"{left.years} jaar{'' if left.years != 1 else ''}, "
+                        f"{left.months} maand{'en' if left.months != 1 else ''}, "
+                        f"{left.days} dag{'en' if left.days != 1 else ''}"
+                    ),
+                    "work_time": work_stats,
+                }
+
+                today = date.today()
+                total_span = (r_date - birth).days
+                elapsed = (today - birth).days
+
+                if total_span > 0:
+                    percent_done = min(100, int(100 * (elapsed / total_span)))
+                else:
+                    percent_done = 100
+                result["progress_percent"] = percent_done
+
+                if r_age.estimated or is_est1 or is_est2:
+                    warning = "De AOW-leeftijd is een schatting op basis van de verwachte levensverwachting (CBS-prognoses na 2040)."
+
+            except Exception as exc:
+                logger.exception(f"Unexpected error occurred during form submission from session: {exc}")
+                form = BirthDateForm()
+        else:
+            form = BirthDateForm()
 
     # ── render ───────────────────────────────────────────────────────────
     return render(
@@ -83,3 +128,8 @@ def index(request):
 
 def over(request):
     return render(request, "over.html")
+
+
+def reset(request):
+    request.session.pop("last_birth_date", None)
+    return redirect("index")
