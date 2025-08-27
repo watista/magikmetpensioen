@@ -142,7 +142,11 @@
         </div>
     </div>
     <!-- Retirement info block -->
+    {% if result %}
     <div class="container mt-5 animate-answer" data-aos="fade-up">
+    {% else %}
+    <div class="container mt-2 animate-answer" data-aos="fade-up">
+    {% endif %}
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-light border-bottom">
                 <h5 class="mb-0"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Meer weten over je pensioen?</h5>
