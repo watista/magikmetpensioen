@@ -3,10 +3,10 @@
 <html lang="nl">
 
 <head>
-    <title>{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Mag ik met pensioen?{% endif %}</title>
+    <title>{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Wanneer mag ik met pensioen?{% endif %}</title>
     <meta charset="utf-8">
-    <meta name="title" content="{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Mag ik met pensioen?{% endif %}">
-    <meta name="description" content="Ontdek je AOW-leeftijd en zie precies hoeveel werkdagen, weken en uren je nog moet werken tot je pensioen.">
+    <meta name="title" content="{% if result.left and not can_retire %}Nee, nog niet :({% elif result.left and can_retire %}Ja, je mag met pensioen :){% else %}Wanneer mag ik met pensioen?{% endif %}">
+    <meta name="description" content="Wil je weten wanneer je met pensioen mag? Ontdek je AOW-leeftijd en zie precies hoeveel werkdagen, weken en uren je nog moet werken tot je pensioen.">
     <meta name="robots" content="INDEX,FOLLOW">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
@@ -31,10 +31,10 @@
     <div id="particles-js"></div>
     <div style="margin: 0 0.75rem">
         <div class="container py-5 {% if result.left and not can_retire %}border animate-answer border-4 border-danger bg-danger-subtle rounded p-3{% elif result.left and can_retire %}border animate-answer border-4 border-success bg-success-subtle rounded p-3{% else %}{% endif %}" data-aos="fade-up">
-            <h1 class="mb-4 text-center fw-bold">Mag ik met pensioen?</h1>
+            <h1 class="mb-4 text-center fw-bold">Wanneer mag ik met pensioen?</h1>
             {% if not result %}
             <p class="text-muted text-center">
-                Check hier of je al met pensioen mag, of hoelang je nog moet werken...
+                Check hier wanneer je met pensioen mag, en hoelang je nog moet werken...
             </p>
             <div class="card shadow-sm mx-auto" style="max-width:32rem;">
                 <div class="card-body">
