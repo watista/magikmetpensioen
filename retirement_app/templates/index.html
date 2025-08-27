@@ -148,7 +148,11 @@
                 <h5 class="mb-0"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Meer weten over je pensioen?</h5>
             </div>
             <div class="card-body">
+                {% if result %}
                 <p>Nu je weet wanneer je AOW-leeftijd is, is het handig om je goed voor te bereiden op je pensioen. Hier zijn een paar nuttige bronnen:</p>
+                {% else %}
+                <p>Het is altijd handig om je goed voor te bereiden op je pensioen. Hier zijn een paar nuttige bronnen:</p>
+                {% endif %}
                 <ul class="list-unstyled">
                     <li><i class="fa-solid fa-link me-2 text-muted"></i>
                         <a href="https://www.svb.nl/nl/aow" target="_blank" rel="noopener">Officiële AOW informatie – SVB</a>
